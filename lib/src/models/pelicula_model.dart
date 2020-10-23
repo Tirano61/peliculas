@@ -13,6 +13,43 @@ class Peliculas {
   }
 }
 
+class Totales {
+  List<Total> items = new List();
+
+  Totales();
+  Totales.fromJsonList(List<dynamic> jsonList) {
+    if (jsonList == null) return;
+    for (var item in jsonList) {
+      final total = new Total.fromJsonMap(item);
+      items.add(total);
+    }
+  }
+}
+
+
+
+class Total {
+  int page;
+  int totalResults;
+  int totalPages;
+
+  Total({
+    this.page,
+    this.totalResults,
+    this.totalPages,
+  });
+  Total.fromJsonMap(Map<String, dynamic> json){
+
+  page         = json['page'];
+  totalResults = json['total_results'];
+  totalPages   = json['total_pages'];
+  
+
+  }
+
+}
+
+
 class Pelicula {
   String uniqueId;
 

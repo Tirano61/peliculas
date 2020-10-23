@@ -10,6 +10,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     peliculasProvider.getPopulares();
+    peliculasProvider.getENCines();
 
     return Scaffold(
       appBar: AppBar(
@@ -19,9 +20,11 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              showSearch(context: context,
-              delegate: DataSearch(),
-              query: '',//este parametro se envia a la busqueda y aparece escrito
+              showSearch(
+                context: context,
+                delegate: DataSearch(),
+                query:
+                    '', //este parametro se envia a la busqueda y aparece escrito
               );
             },
           ),
@@ -31,6 +34,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            
             _swiperTarjetas(),
             _footer(context),
           ],
@@ -40,9 +44,9 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _swiperTarjetas() {
-    return FutureBuilder(
-      future: peliculasProvider.getENCines(),
-      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+    return StreamBuilder(
+      stream: peliculasProvider.enCinesStream,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           return CardSwiper(peliculas: snapshot.data);
         } else {

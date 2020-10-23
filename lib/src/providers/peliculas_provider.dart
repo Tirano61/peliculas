@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,14 @@ class PeliculasProvider {
   String _language = 'es-ES';
 
   int _popularesPage = 0;
+  int _encinesPage = 0;
   bool _cargando = false;
+  bool _cargandoEnCines = false;
+
+  List<Pelicula> _enCinesList = new List();
+  final _enCinesStreamController = StreamController<List<Pelicula>>.broadcast();
+  Function(List<Pelicula>) get enCinesSink => _enCinesStreamController.sink.add;
+  Stream<List<Pelicula>> get enCinesStream => _enCinesStreamController.stream;
 
   List<Pelicula> _populares = new List();
 
@@ -27,6 +35,7 @@ class PeliculasProvider {
 el cual, existe lo cierra si no no hace nada */
   void diposeStem() {
     _popularesStreamController?.close();
+    _enCinesStreamController?.close();
   }
 
   Future<List<Pelicula>> _procesarRespuesta(Uri url) async {
@@ -38,11 +47,21 @@ el cual, existe lo cierra si no no hace nada */
   }
 
   Future<List<Pelicula>> getENCines() async {
+    if (_cargandoEnCines) return [];
+    _cargandoEnCines = true;
+    _encinesPage++;
+
     final url = Uri.https(_url, '3/movie/now_playing', {
       'api_key': _apiKey,
       'language': _language,
+      'page': _encinesPage.toString(),
     });
-    return await _procesarRespuesta(url);
+    final resp = await _procesarRespuesta(url);
+    _enCinesList.addAll(resp);
+    enCinesSink(_enCinesList);
+
+    _cargandoEnCines = false;
+    return resp;
   }
 
   Future<List<Actor>> getCast(String peliId) async {
@@ -54,7 +73,7 @@ el cual, existe lo cierra si no no hace nada */
     final decodeData = json.decode(resp.body);
 
     final cast = Cast.fromJsonList(decodeData['cast']);
-    
+
     return cast.actores;
   }
 
@@ -80,14 +99,12 @@ el cual, existe lo cierra si no no hace nada */
     return resp;
   }
 
-
   Future<List<Pelicula>> getbuscarPelicula(String query) async {
     final url = Uri.https(_url, '3/search/movie', {
       'api_key': _apiKey,
       'language': _language,
-      'query'   : query,
+      'query': query,
     });
     return await _procesarRespuesta(url);
   }
-
 }

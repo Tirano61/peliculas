@@ -5,7 +5,7 @@ import 'package:peliculas/src/models/pelicula_model.dart';
 
 class CardSwiper extends StatelessWidget {
   final List<Pelicula> peliculas;
-
+  
   //Constructor con parametro requerido
   CardSwiper({@required this.peliculas});
 
@@ -31,8 +31,7 @@ class CardSwiper extends StatelessWidget {
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(20.0),
                 child: GestureDetector(
-
-                  //Enviar a la pagina Detalle//************************* */  
+                  //Enviar a la pagina Detalle//************************* */
 
                   onTap: () => Navigator.pushNamed(context, 'detalle',
                       arguments: peliculas[index]),
@@ -48,7 +47,8 @@ class CardSwiper extends StatelessWidget {
         },
         itemCount: peliculas.length,
         //Controles que se pueden usar,
-
+          loop: false,
+          index: 0,
         //pagination: new SwiperPagination(),
         //control: new SwiperControl(),
       ),
